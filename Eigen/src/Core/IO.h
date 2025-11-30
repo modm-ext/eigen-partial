@@ -14,6 +14,8 @@
 // IWYU pragma: private
 #include "./InternalHeaderCheck.h"
 
+#include <modm/io.hpp>
+
 namespace Eigen {
 
 enum { DontAlignCols = 1 };
@@ -21,7 +23,7 @@ enum { StreamPrecision = -1, FullPrecision = -2 };
 
 namespace internal {
 template <typename Derived>
-std::ostream& print_matrix(std::ostream& s, const Derived& _m, const IOFormat& fmt);
+modm::IOStream& print_matrix(modm::IOStream& s, const Derived& _m, const IOFormat& fmt);
 }
 
 /** \class IOFormat
@@ -102,7 +104,7 @@ class WithFormat {
  public:
   WithFormat(const ExpressionType& matrix, const IOFormat& format) : m_matrix(matrix), m_format(format) {}
 
-  friend std::ostream& operator<<(std::ostream& s, const WithFormat& wf) {
+  friend modm::IOStream& operator<<(modm::IOStream& s, const WithFormat& wf) {
     return internal::print_matrix(s, wf.m_matrix.eval(), wf.m_format);
   }
 
@@ -124,7 +126,7 @@ struct significant_decimals_impl {
 /** \internal
  * print the matrix \a _m to the output stream \a s using the output format \a fmt */
 template <typename Derived>
-std::ostream& print_matrix(std::ostream& s, const Derived& _m, const IOFormat& fmt) {
+modm::IOStream& print_matrix(modm::IOStream& s, const Derived& _m, const IOFormat& fmt) {
   using internal::is_same;
 
   if (_m.size() == 0) {
@@ -167,10 +169,19 @@ std::ostream& print_matrix(std::ostream& s, const Derived& _m, const IOFormat& f
     // compute the largest width
     for (Index j = 0; j < m.cols(); ++j)
       for (Index i = 0; i < m.rows(); ++i) {
-        std::stringstream sstr;
-        sstr.copyfmt(s);
-        sstr << static_cast<PrintType>(m.coeff(i, j));
-        width = std::max<Index>(width, Index(sstr.str().length()));
+        char tmpbuf[64];
+        std::streamsize prec  = s.precision();
+        int len = 0;
+        if constexpr (std::is_floating_point_v<PrintType>) {
+            if (prec > 0)
+                len = snprintf(tmpbuf, sizeof(tmpbuf), "%.*g", (int)prec, (double)static_cast<PrintType>(m.coeff(i, j)));
+            else
+                len = snprintf(tmpbuf, sizeof(tmpbuf), "%g", (double)static_cast<PrintType>(m.coeff(i, j)));
+        } else {
+            len = snprintf(tmpbuf, sizeof(tmpbuf), "%lld", (long long)static_cast<PrintType>(m.coeff(i, j)));
+        }
+        if (len > width)
+            width = len;
       }
   }
   std::streamsize old_width = s.width();
@@ -219,12 +230,12 @@ std::ostream& print_matrix(std::ostream& s, const Derived& _m, const IOFormat& f
  * \sa DenseBase::format()
  */
 template <typename Derived>
-std::ostream& operator<<(std::ostream& s, const DenseBase<Derived>& m) {
+modm::IOStream& operator<<(modm::IOStream& s, const DenseBase<Derived>& m) {
   return internal::print_matrix(s, m.eval(), EIGEN_DEFAULT_IO_FORMAT);
 }
 
 template <typename Derived>
-std::ostream& operator<<(std::ostream& s, const DiagonalBase<Derived>& m) {
+modm::IOStream& operator<<(modm::IOStream& s, const DiagonalBase<Derived>& m) {
   return internal::print_matrix(s, m.derived(), EIGEN_DEFAULT_IO_FORMAT);
 }
 
