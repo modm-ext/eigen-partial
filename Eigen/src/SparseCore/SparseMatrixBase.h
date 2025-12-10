@@ -223,7 +223,7 @@ class SparseMatrixBase : public EigenBase<Derived> {
 
  public:
 #ifndef EIGEN_NO_IO
-  friend std::ostream& operator<<(std::ostream& s, const SparseMatrixBase& m) {
+  friend modm::IOStream& operator<<(modm::IOStream& s, const SparseMatrixBase& m) {
     using Nested = typename Derived::Nested;
     using NestedCleaned = typename internal::remove_all<Nested>::type;
 

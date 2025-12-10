@@ -893,7 +893,7 @@ class SparseMatrix : public SparseCompressedBase<SparseMatrix<Scalar_, Options_,
   }
 
 #ifndef EIGEN_NO_IO
-  friend std::ostream& operator<<(std::ostream& s, const SparseMatrix& m) {
+  friend modm::IOStream& operator<<(modm::IOStream& s, const SparseMatrix& m) {
     EIGEN_DBG_SPARSE(
         s << "Nonzero entries:\n"; if (m.isCompressed()) {
           for (Index i = 0; i < m.nonZeros(); ++i) s << "(" << m.m_data.value(i) << "," << m.m_data.index(i) << ") ";

@@ -339,7 +339,7 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
 #endif
 
 #ifndef EIGEN_NO_IO
-  friend std::ostream& operator<<(std::ostream& s, const SparseVector& m) {
+  friend modm::IOStream& operator<<(modm::IOStream& s, const SparseVector& m) {
     for (Index i = 0; i < m.nonZeros(); ++i) s << "(" << m.m_data.value(i) << "," << m.m_data.index(i) << ") ";
     s << std::endl;
     return s;

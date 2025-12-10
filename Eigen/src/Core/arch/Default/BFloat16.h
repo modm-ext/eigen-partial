@@ -679,7 +679,7 @@ EIGEN_DEVICE_FUNC inline bfloat16 fma(const bfloat16& a, const bfloat16& b, cons
 }
 
 #ifndef EIGEN_NO_IO
-EIGEN_ALWAYS_INLINE std::ostream& operator<<(std::ostream& os, const bfloat16& v) {
+EIGEN_ALWAYS_INLINE modm::IOStream& operator<<(modm::IOStream& os, const bfloat16& v) {
   os << static_cast<float>(v);
   return os;
 }

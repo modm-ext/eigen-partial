@@ -1672,7 +1672,7 @@ class StreamablePacket {
   using Scalar = typename unpacket_traits<Packet>::type;
   StreamablePacket(const Packet& packet) { pstoreu(v_, packet); }
 
-  friend std::ostream& operator<<(std::ostream& os, const StreamablePacket& packet) {
+  friend modm::IOStream& operator<<(modm::IOStream& os, const StreamablePacket& packet) {
     os << "{" << packet.v_[0];
     for (int i = 1; i < unpacket_traits<Packet>::size; ++i) {
       os << "," << packet.v_[i];

@@ -3217,7 +3217,7 @@ struct unpacket_traits<Packet2l> {
   };
 };
 
-inline std::ostream& operator<<(std::ostream& s, const Packet2l& v) {
+inline modm::IOStream& operator<<(modm::IOStream& s, const Packet2l& v) {
   union {
     Packet2l v;
     int64_t n[2];
@@ -3227,7 +3227,7 @@ inline std::ostream& operator<<(std::ostream& s, const Packet2l& v) {
   return s;
 }
 
-inline std::ostream& operator<<(std::ostream& s, const Packet2d& v) {
+inline modm::IOStream& operator<<(modm::IOStream& s, const Packet2d& v) {
   union {
     Packet2d v;
     double n[2];

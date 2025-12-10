@@ -861,7 +861,7 @@ EIGEN_DEVICE_FUNC inline half fma(const half& a, const half& b, const half& c) {
 }
 
 #ifndef EIGEN_NO_IO
-EIGEN_ALWAYS_INLINE std::ostream& operator<<(std::ostream& os, const half& v) {
+EIGEN_ALWAYS_INLINE modm::IOStream& operator<<(modm::IOStream& os, const half& v) {
   os << static_cast<float>(v);
   return os;
 }
