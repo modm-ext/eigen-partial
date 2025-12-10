@@ -1,0 +1,28 @@
+diff --git a/Eigen/src/Core/IO.h b/Eigen/src/Core/IO.h
+index 0a1b583..f7b9f3a 100644
+--- a/Eigen/src/Core/IO.h
++++ b/Eigen/src/Core/IO.h
+@@ -167,10 +169,19 @@ std::ostream& print_matrix(std::ostream& s, const Derived& _m, const IOFormat& f
+     // compute the largest width
+     for (Index j = 0; j < m.cols(); ++j)
+       for (Index i = 0; i < m.rows(); ++i) {
+-        std::stringstream sstr;
+-        sstr.copyfmt(s);
+-        sstr << static_cast<PrintType>(m.coeff(i, j));
+-        width = std::max<Index>(width, Index(sstr.str().length()));
++        char tmpbuf[64];
++        std::streamsize prec  = s.precision();
++        int len = 0;
++        if constexpr (std::is_floating_point_v<PrintType>) {
++            if (prec > 0)
++                len = snprintf(tmpbuf, sizeof(tmpbuf), "%.*g", (int)prec, (double)static_cast<PrintType>(m.coeff(i, j)));
++            else
++                len = snprintf(tmpbuf, sizeof(tmpbuf), "%g", (double)static_cast<PrintType>(m.coeff(i, j)));
++        } else {
++            len = snprintf(tmpbuf, sizeof(tmpbuf), "%lld", (long long)static_cast<PrintType>(m.coeff(i, j)));
++        }
++        if (len > width)
++            width = len;
+       }
+   }
+   std::streamsize old_width = s.width();

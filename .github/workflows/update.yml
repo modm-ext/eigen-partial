@@ -20,8 +20,12 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           wget -qL https://raw.githubusercontent.com/modm-ext/partial/main/partial.py
-          python3 partial.py -v gitlab:libeigen/eigen LICENSE "COPYING.*" "Eigen/**/*"
+          python3 partial.py --patch=io.patch -v gitlab:libeigen/eigen LICENSE "COPYING.*" "Eigen/**/*"
+          find Eigen/ -type f -name "*.h" -exec sed -i "s/std::ostream/modm::IOStream/g" {} \;
+
       - name: Git push
         if: github.ref == 'refs/heads/main'
         run: |
+          git add Eigen
+          git commit --amend --no-edit
           git push origin main
