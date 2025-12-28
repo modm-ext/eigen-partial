@@ -1,0 +1,33 @@
+name: Update
+
+on:
+  schedule:
+    - cron:  '08 8 * * 3'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Configure Git
+        run: |
+          git config --global user.email "bot@modm.io"
+          git config --global user.name "modm update bot"
+      - name: Update repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          wget -qL https://raw.githubusercontent.com/modm-ext/partial/main/partial.py
+          python3 partial.py -v gitlab:libeigen/eigen LICENSE "COPYING.*" "Eigen/**/*"
+          find Eigen/ -type f -name "*.h" -exec sed -i "s/std::ostringstream ss/modm::OSizeStream ss/g" {} \;
+          find Eigen/ -type f -name "*.h" -exec sed -i "s/std::stringstream ss/modm::OSizeStream ss/g" {} \;
+          find Eigen/ -type f -name "*.h" -exec sed -i "s/std::ostream/modm::IOStream/g" {} \;
+          find Eigen/ -type f -name "*.h" -exec sed -i "s/std::endl/modm::endl/g" {} \;
+
+      - name: Git push
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git add Eigen && git diff --cached --quiet || git commit --amend --no-edit
+          git push origin main
