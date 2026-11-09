@@ -29,5 +29,8 @@ jobs:
       - name: Git push
         if: github.ref == 'refs/heads/main'
         run: |
-          git add Eigen && git diff --cached --quiet || git commit --amend --no-edit
+          git add Eigen
+          git diff --cached --quiet || git commit --amend --no-edit --allow-empty
+          # partial.py always commits pristine upstream, the seds above revert that again
+          if git diff --quiet origin/main HEAD; then echo "No changes"; exit 0; fi
           git push origin main
